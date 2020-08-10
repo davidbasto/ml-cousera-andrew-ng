@@ -66,8 +66,8 @@ Theta2_grad = zeros(size(Theta2));
 %
 
   % Parte 1 - Calculando Cost Function J sem regularização 
-  size(Theta1)
-  size(Theta2)
+  % size(Theta1)
+  % size(Theta2)
   
   yVectorized = zeros(m, num_labels);
 
@@ -89,7 +89,6 @@ Theta2_grad = zeros(size(Theta2));
 
   J = 1/m * sum(sum((- yVectorized .* log(h)) - ((-yVectorized + 1) .* log(-h  + 1))));
 
-
   % Parte 2 - Incluindo regularização na Cost Function J
   % Para usar as matrizes Theta1 e Theta2, deve-se excluir a primeira colunar
   % referente aos parâmetros do bias unit
@@ -99,6 +98,39 @@ Theta2_grad = zeros(size(Theta2));
   reg
   J = J + reg;
 
+  % Backpropagation Algorithm
+  for t = 1:m 
+    X_t = X(t, :)';
+    y_t = yVectorized(t, :)';
+
+    % Inputs (Primeira camada da Rede)
+    a1_t = [1; X_t];
+    z2_t = Theta1 * a1_t;
+
+    % Segunda camada da Rede
+    a2_t = sigmoid(z2_t);
+    a2_t = [1; a2_t];
+
+    % Outputs (Terceira camada da Rede)
+    z3_t = Theta2 * a2_t; 
+    a3_t = sigmoid(z3_t);
+
+    delta_3 = a3_t - y_t;
+    delta_2 = (Theta2' * delta_3) .* [1; sigmoidGradient(z2_t)];
+    delta_2 = delta_2(2:end);
+
+%    delta_2 = Theta2' * delta_3;
+%    delta_2 = delta_2(2:end) .* sigmoidGradient(z2_t);
+    
+    Theta2_grad = Theta2_grad + delta_3 * a2_t';
+    Theta1_grad = Theta1_grad + delta_2 * a1_t';
+  end
+
+  Theta1_grad = Theta1_grad * (1/m);
+  Theta2_grad = Theta2_grad * (1/m);
+
+%  size(Theta1_grad)
+%  size(Theta2_grad)
 % -------------------------------------------------------------
 
 % =========================================================================
