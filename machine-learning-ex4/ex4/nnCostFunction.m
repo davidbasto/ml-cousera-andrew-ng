@@ -115,22 +115,28 @@ Theta2_grad = zeros(size(Theta2));
     z3_t = Theta2 * a2_t; 
     a3_t = sigmoid(z3_t);
 
+    % Diferença da camada de output em relação ao valor real dos valores treinados (delta_3)
     delta_3 = a3_t - y_t;
+
+    % Delta da segunda camada.
     delta_2 = (Theta2' * delta_3) .* [1; sigmoidGradient(z2_t)];
     delta_2 = delta_2(2:end);
 
-%    delta_2 = Theta2' * delta_3;
-%    delta_2 = delta_2(2:end) .* sigmoidGradient(z2_t);
-    
+    % Acumulador do gradient dos parâmetros Theta1 e Theta2
     Theta2_grad = Theta2_grad + delta_3 * a2_t';
     Theta1_grad = Theta1_grad + delta_2 * a1_t';
   end
 
-  Theta1_grad = Theta1_grad * (1/m);
-  Theta2_grad = Theta2_grad * (1/m);
+  reg1 = (lambda/m) * Theta1;
+  reg1(:, 1) = zeros(size(Theta1, 1), 1);
+  
+  reg2 = (lambda/m) * Theta2;
+  reg2(:, 1) = zeros(size(Theta2, 1), 1);
+  
+  % Terminando de calcular os gradientes.
+  Theta1_grad = Theta1_grad * (1/m) + reg1;
+  Theta2_grad = Theta2_grad * (1/m) + reg2;
 
-%  size(Theta1_grad)
-%  size(Theta2_grad)
 % -------------------------------------------------------------
 
 % =========================================================================
